@@ -1,18 +1,41 @@
+// public/admin.js (FIX LENGKAP)
+// - Tambah setting RUNNING TEXT: marquee_text
+// - Background cuma 1 (pakai bg_left_url), bg_right_url di-reset ""
+// - credentials include (cookie session)
+// - Error handling aman (json/text)
+
 const $ = (s) => document.querySelector(s);
 
 async function api(url, opts = {}) {
   const headers = { ...(opts.headers || {}) };
   const hasBody = opts.body !== undefined && opts.body !== null;
+
   if (hasBody && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
 
   const r = await fetch(url, { credentials: "include", ...opts, headers });
   const ct = r.headers.get("content-type") || "";
-  const body = ct.includes("application/json") ? await r.json() : await r.text();
-  if (!r.ok) throw body;
+
+  let body;
+  try {
+    body = ct.includes("application/json") ? await r.json() : await r.text();
+  } catch {
+    body = await r.text().catch(() => "");
+  }
+
+  if (!r.ok) {
+    // normalisasi error supaya #msg tampil enak
+    const msg =
+      (typeof body === "object" && body && (body.error || body.message)) ? (body.error || body.message)
+      : (typeof body === "string" && body.trim() ? body.trim()
+      : `HTTP ${r.status}`);
+    throw { status: r.status, error: msg, raw: body };
+  }
+
   return body;
 }
 
 function show(el, yes) { if (el) el.hidden = !yes; }
+function setMsg(id, text) { const el = $(id); if (el) el.textContent = text || ""; }
 
 async function checkLogin() {
   try { await api("/api/admin/me"); return true; } catch { return false; }
@@ -20,10 +43,19 @@ async function checkLogin() {
 
 async function loadSiteIntoForm() {
   const s = await api("/api/site");
+
   $("#site_title").value = s.site_title || "";
   $("#site_logo_url").value = s.site_logo_url || "";
+
   // ✅ 1 background: pakai bg_left_url
   $("#bg_left_url").value = s.bg_left_url || "";
+
+  // ✅ running text
+  // support 2 kemungkinan nama field (biar kompatibel)
+  const mt = s.marquee_text ?? s.marqueeText ?? "";
+  const el = $("#marquee_text");
+  if (el) el.value = mt || "";
+
   $("#link_login").value = s.link_login || "";
   $("#link_daftar").value = s.link_daftar || "";
 }
@@ -32,10 +64,11 @@ async function loadMarketsTable() {
   const rows = await api("/api/markets");
   const tb = $("#marketRows");
   tb.innerHTML = "";
+
   for (const m of rows) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><img class="logo" src="${m.logo_url}" alt=""></td>
+      <td><img class="logo" src="${m.logo_url}" alt="" onerror="this.style.opacity=.2"></td>
       <td>${m.id}</td>
       <td>${m.name}</td>
       <td>${m.sort_order}</td>
@@ -53,10 +86,10 @@ async function loadMarketsTable() {
       if (!confirm(`Hapus market ${id}?`)) return;
       try {
         await api(`/api/admin/markets/${id}`, { method: "DELETE" });
-        $("#marketMsg").textContent = "Terhapus ✅";
+        setMsg("#marketMsg", "Terhapus ✅");
         await loadMarketsTable();
       } catch (e) {
-        $("#marketMsg").textContent = `Gagal: ${e?.error || e}`;
+        setMsg("#marketMsg", `Gagal: ${e?.error || e}`);
       }
     });
   });
@@ -76,10 +109,10 @@ async function loadMarketsTable() {
           method: "PUT",
           body: JSON.stringify({ name, logo_url, sort_order: Number(sort_order) })
         });
-        $("#marketMsg").textContent = "Tersimpan ✅";
+        setMsg("#marketMsg", "Tersimpan ✅");
         await loadMarketsTable();
       } catch (e) {
-        $("#marketMsg").textContent = `Gagal: ${e?.error || e}`;
+        setMsg("#marketMsg", `Gagal: ${e?.error || e}`);
       }
     });
   });
@@ -96,27 +129,30 @@ async function enterPanel() {
 document.addEventListener("DOMContentLoaded", async () => {
   if (await checkLogin()) await enterPanel();
 
-  $("#btnLogin").addEventListener("click", async () => {
-    $("#loginMsg").textContent = "";
+  $("#btnLogin")?.addEventListener("click", async () => {
+    setMsg("#loginMsg", "");
     try {
       await api("/api/admin/login", {
         method: "POST",
         body: JSON.stringify({ id: $("#aid").value, password: $("#apw").value })
       });
-      $("#loginMsg").textContent = "Login sukses ✅";
+      setMsg("#loginMsg", "Login sukses ✅");
       await enterPanel();
     } catch (e) {
-      $("#loginMsg").textContent = `Login gagal: ${e?.error || e}`;
+      setMsg("#loginMsg", `Login gagal: ${e?.error || e}`);
     }
   });
 
-  $("#btnLogout").addEventListener("click", async () => {
-    await api("/api/admin/logout", { method: "POST", body: "{}" });
-    location.reload();
+  $("#btnLogout")?.addEventListener("click", async () => {
+    try {
+      await api("/api/admin/logout", { method: "POST", body: "{}" });
+    } finally {
+      location.reload();
+    }
   });
 
-  $("#btnSaveSite").addEventListener("click", async () => {
-    $("#siteMsg").textContent = "";
+  $("#btnSaveSite")?.addEventListener("click", async () => {
+    setMsg("#siteMsg", "");
     try {
       await api("/api/admin/site", {
         method: "POST",
@@ -124,43 +160,46 @@ document.addEventListener("DOMContentLoaded", async () => {
           site_title: $("#site_title").value,
           site_logo_url: $("#site_logo_url").value,
 
-          // ✅ background cuma 1 (pakai bg_left_url)
+          // ✅ background cuma 1
           bg_left_url: $("#bg_left_url").value,
-
-          // ✅ reset field lama biar bener-bener “1 background”
           bg_right_url: "",
+
+          // ✅ running text
+          marquee_text: ($("#marquee_text") ? $("#marquee_text").value : ""),
 
           link_login: $("#link_login").value,
           link_daftar: $("#link_daftar").value
         })
       });
-      $("#siteMsg").textContent = "Tersimpan ✅ (cek halaman utama)";
+      setMsg("#siteMsg", "Tersimpan ✅ (cek halaman utama)");
     } catch (e) {
-      $("#siteMsg").textContent = `Gagal: ${e?.error || e}`;
+      setMsg("#siteMsg", `Gagal: ${e?.error || e}`);
     }
   });
 
-  $("#btnAddMarket").addEventListener("click", async () => {
-    $("#marketMsg").textContent = "";
+  $("#btnAddMarket")?.addEventListener("click", async () => {
+    setMsg("#marketMsg", "");
     const name = $("#m_name").value.trim();
     const logo_url = $("#m_logo").value.trim();
     const sort_order = Number($("#m_sort").value || 0);
+
     if (!name || !logo_url) {
-      $("#marketMsg").textContent = "Nama & Logo URL wajib diisi";
+      setMsg("#marketMsg", "Nama & Logo URL wajib diisi");
       return;
     }
+
     try {
       await api("/api/admin/markets", {
         method: "POST",
         body: JSON.stringify({ name, logo_url, sort_order })
       });
-      $("#marketMsg").textContent = "Berhasil tambah ✅";
+      setMsg("#marketMsg", "Berhasil tambah ✅");
       $("#m_name").value = "";
       $("#m_logo").value = "";
       $("#m_sort").value = "";
       await loadMarketsTable();
     } catch (e) {
-      $("#marketMsg").textContent = `Gagal: ${e?.error || e}`;
+      setMsg("#marketMsg", `Gagal: ${e?.error || e}`);
     }
   });
 });
