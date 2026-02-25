@@ -15,12 +15,9 @@
   <!-- TOPBAR -->
   <header class="top" id="top">
     <div class="top-inner">
-      <a class="brand" href="#top" aria-label="Home">
+      <!-- ✅ LOGO ONLY (set dari admin: site_logo_url) -->
+      <a class="brand brand--logoOnly" href="#top" aria-label="Home">
         <img id="siteLogo" class="brand-logo" src="https://via.placeholder.com/44x44.png?text=W" alt="Logo">
-        <div class="brand-text">
-          <div class="brand-name" id="siteTitle">WDBANDAR</div>
-          <div class="brand-sub">Official</div>
-        </div>
       </a>
 
       <div class="top-search">
@@ -36,9 +33,11 @@
   <div class="marquee-wrap" aria-label="Running info">
     <div class="marquee">
       <div class="marquee-track">
-        <span id="marqueeText">Update otomatis mengikuti WIB.</span>
+        <span id="marqueeText">| SELAMAT DATANG DI WDBANDAR BANDAR TOGEL, SPORTBOOK, LIVE CASINO & SLOT TERBAIK DAN TERPERCAYA DI INDONESIA DENGAN BONUS-BONUS TANPA BATAS SETIAP HARI. | Nikmati prediksi hari ini. | Semoga keberuntungan selalu menyertai Anda! | Periksa angka Anda setiap hari! | 1 ID UNTUK SEMUA PERMAINAN
+</span>
         <span class="marquee-sep">•</span>
-        <span id="marqueeText2">Update otomatis mengikuti WIB.</span>
+        <span id="marqueeText2">| SELAMAT DATANG DI WDBANDAR BANDAR TOGEL, SPORTBOOK, LIVE CASINO & SLOT TERBAIK DAN TERPERCAYA DI INDONESIA DENGAN BONUS-BONUS TANPA BATAS SETIAP HARI. | Nikmati prediksi hari ini. | Semoga keberuntungan selalu menyertai Anda! | Periksa angka Anda setiap hari! | 1 ID UNTUK SEMUA PERMAINAN
+</span>
         <span class="marquee-sep">•</span>
       </div>
     </div>
@@ -52,15 +51,12 @@
         <button id="btnClose" class="icon-btn" aria-label="Close">✕</button>
       </div>
 
+      <!-- ✅ MENU: LOGIN, DAFTAR, PREDIKSI BOLA, BUKTI PEMBAYARAN, INFO -->
       <nav class="drawer-nav">
-        <a href="https://prediksibolawdbandar.xyz" target="_blank" rel="noopener">PREDIKSI BOLA</a>
-        <a href="https://prediksibolawdbandar.store/" target="_blank" rel="noopener">BUKTI PEMBAYARAN</a>
-
         <a id="linkLogin" href="#" target="_blank" rel="noopener">LOGIN</a>
         <a id="linkDaftar" href="#" target="_blank" rel="noopener">DAFTAR</a>
-
-        <a href="/admin">ADMIN</a>
-        <a href="#top">HOME</a>
+        <a href="https://prediksibolawdbandar.xyz" target="_blank" rel="noopener">PREDIKSI BOLA</a>
+        <a href="https://prediksibolawdbandar.store/" target="_blank" rel="noopener">BUKTI PEMBAYARAN</a>
         <a href="#bottom">INFO</a>
       </nav>
     </div>
@@ -74,12 +70,12 @@
     <section class="mid">
       <div class="mid-wrap">
         <div class="hero">
-          <div class="hero-kicker">WDBANDAR</div>
+          <div class="hero-kicker">Prediksi Togel</div>
 
           <!-- Klik judul => balik ke home + reset -->
           <h1 class="hero-title">
             <a href="#top" id="homeReset" style="text-decoration:none;color:inherit;">
-              PREDIKSI<br>HIBURAN
+              PREDIKSI TOGEL <br>WDBANDAR
             </a>
           </h1>
 
@@ -150,7 +146,9 @@
             <span class="info-ic">i</span>
             <div class="info-title">Informasi</div>
           </div>
-          <p class="info-text">Konten hiburan/demonstrasi UI.</p>
+          <p class="info-text">Prediksi ini disediakan untuk hiburan semata. Hasil prediksi tidak dijamin akurat 100%. Gunakan dengan bijak dan bertanggung jawab. Selalu ingat untuk bermain dengan batas yang wajar.
+
+</p>
         </div>
 
         <footer class="foot" id="bottom">
@@ -179,6 +177,33 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
     });
+  </script>
+
+  <!-- ✅ SET dari ADMIN: logo + link login/daftar + running text -->
+  <script>
+    (function () {
+      fetch("/api/site")
+        .then(r => r.json())
+        .then(s => {
+          // logo from admin
+          const logo = document.getElementById("siteLogo");
+          if (logo && s.site_logo_url) logo.src = s.site_logo_url;
+
+          // links from admin
+          const aLogin = document.getElementById("linkLogin");
+          const aDaftar = document.getElementById("linkDaftar");
+          if (aLogin && s.link_login) aLogin.href = s.link_login;
+          if (aDaftar && s.link_daftar) aDaftar.href = s.link_daftar;
+
+          // running text from admin
+          const t = (s.marquee_text || s.marqueeText || "Update otomatis mengikuti WIB.").trim();
+          const m1 = document.getElementById("marqueeText");
+          const m2 = document.getElementById("marqueeText2");
+          if (m1) m1.textContent = t;
+          if (m2) m2.textContent = t;
+        })
+        .catch(() => {});
+    })();
   </script>
 
   <script src="./app.js"></script>
