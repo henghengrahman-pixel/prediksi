@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#07101f;color:#eaf0ff}
+    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .card{border:1px solid rgba(255,255,255,.10);background:rgba(8,22,40,.86);border-radius:14px;padding:14px;margin-bottom:12px}
+    h1{margin:0 0 8px;font-size:20px}
+    h2{margin:0 0 10px;font-size:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .col{flex:1;min-width:240px}
+    label{display:block;font-size:12px;opacity:.8;margin:0 0 6px;font-weight:700}
+    input{width:100%;padding:10px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.06);color:#eaf0ff;outline:none}
+    button{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:rgba(47,139,255,.85);font-weight:800;cursor:pointer}
+    .ghost{background:rgba(255,255,255,.06)}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:8px;font-size:13px;text-align:left;vertical-align:top}
+    .mini{font-size:12px;opacity:.8}
+    .logo{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.10);object-fit:cover;background:rgba(255,255,255,.06)}
+    .msg{margin-top:10px;font-size:13px;opacity:.9}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Admin Panel</h1>
+      <div class="mini">Login pakai ADMIN_ID & ADMIN_PASSWORD (Railway Variables)</div>
+    </div>
+
+    <div class="card" id="loginCard">
+      <h2>Login</h2>
+      <div class="row">
+        <div class="col">
+          <label>Admin ID</label>
+          <input id="aid" placeholder="ADMIN_ID">
+        </div>
+        <div class="col">
+          <label>Password</label>
+          <input id="apw" type="password" placeholder="ADMIN_PASSWORD">
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <button id="btnLogin">Login</button>
+        <a href="/" style="color:#eaf0ff;align-self:center">← Back</a>
+      </div>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div class="card" id="panelCard" hidden>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2>Site Settings</h2>
+        <button class="ghost" id="btnLogout">Logout</button>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Site Title</label>
+          <input id="site_title">
+        </div>
+        <div class="col">
+          <label>Logo URL</label>
+          <input id="site_logo_url">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="col">
+          <label>Background Left URL</label>
+          <input id="bg_left_url">
+        </div>
+        <div class="col">
+          <label>Background Right URL</label>
+          <input id="bg_right_url">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="col">
+          <label>Link Login</label>
+          <input id="link_login">
+        </div>
+        <div class="col">
+          <label>Link Daftar</label>
+          <input id="link_daftar">
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <button id="btnSaveSite">Simpan Settings</button>
+        <span class="msg" id="siteMsg"></span>
+      </div>
+    </div>
+
+    <div class="card" id="marketsCard" hidden>
+      <h2>Markets / Pasaran</h2>
+
+      <div class="row">
+        <div class="col">
+          <label>Nama</label>
+          <input id="m_name" placeholder="contoh: HONGKONG">
+        </div>
+        <div class="col">
+          <label>Logo URL</label>
+          <input id="m_logo" placeholder="https://...png">
+        </div>
+        <div class="col">
+          <label>Sort Order (angka)</label>
+          <input id="m_sort" placeholder="1">
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <button id="btnAddMarket">Tambah</button>
+        <span class="msg" id="marketMsg"></span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Sort</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="marketRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="./admin.js"></script>
+</body>
+</html>
