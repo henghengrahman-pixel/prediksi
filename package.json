@@ -1,0 +1,14 @@
+{
+  "name": "dashboard-admin-wib",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.6.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2"
+  }
+}
