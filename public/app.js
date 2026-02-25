@@ -1,9 +1,18 @@
+// public/app.js (UPDATED FIX LENGKAP)
+// - btnRefresh diganti jadi "PASANG ANGKA SEKARANG" => buka link_login (sama kayak menu LOGIN)
+// - refresh data pindah ke tombol baru (opsional) via double click pada banner (biar tetap ada refresh tanpa nambah UI)
+// - running text dari admin tetap jalan, tapi TIDAK ditimpa update market (biar konsisten)
+// - simpan login url global dari /api/site
+
 const $ = (s) => document.querySelector(s);
 
 let markets = [];
 let lastMarketId = null;
 let lastData = null;      // tanda: sudah pernah load prediction
 let started = false;      // tanda: user sudah klik LIHAT / Search pilih market
+
+let SITE_LOGIN_URL = "#";     // dari admin
+let SITE_MARQUEE_TEXT = "";   // dari admin
 
 /* ============================= */
 /* Drawer */
@@ -33,7 +42,6 @@ function fillMarkets(list) {
 
   sel.innerHTML = "";
 
-  // tambah placeholder biar jelas belum pilih
   const ph = document.createElement("option");
   ph.value = "";
   ph.textContent = "— Pilih pasaran dulu —";
@@ -46,7 +54,6 @@ function fillMarkets(list) {
     sel.appendChild(opt);
   }
 
-  // default: jangan auto pilih market pertama
   lastMarketId = null;
   sel.value = "";
 }
@@ -57,7 +64,7 @@ function joinList(arr) {
 }
 
 /* ============================= */
-/* Load Site (background 1 saja) */
+/* Site (logo/bg/links/marquee)  */
 /* ============================= */
 async function loadSite() {
   const r = await fetch("/api/site");
@@ -65,7 +72,7 @@ async function loadSite() {
 
   document.title = s.site_title || "Dashboard";
 
-  if ($("#siteTitle")) $("#siteTitle").textContent = s.site_title || "WDBOS";
+  // logo only
   if ($("#siteLogo")) $("#siteLogo").src = s.site_logo_url || $("#siteLogo").src;
 
   // Background 1 saja (pakai bg_left_url)
@@ -73,16 +80,23 @@ async function loadSite() {
     document.documentElement.style.setProperty("--bg-url", `url("${s.bg_left_url}")`);
   }
 
-  if ($("#linkLogin")) $("#linkLogin").href = s.link_login || "#";
+  // links
+  SITE_LOGIN_URL = s.link_login || "#";
+  if ($("#linkLogin")) $("#linkLogin").href = SITE_LOGIN_URL;
   if ($("#linkDaftar")) $("#linkDaftar").href = s.link_daftar || "#";
 
-  // kalau kamu sudah pasang running text (marquee)
-  if ($("#marqueeText") && typeof s.marquee_text === "string") $("#marqueeText").textContent = s.marquee_text;
-  if ($("#marqueeText2") && typeof s.marquee_text === "string") $("#marqueeText2").textContent = s.marquee_text;
+  // marquee dari admin
+  SITE_MARQUEE_TEXT = (s.marquee_text ?? s.marqueeText ?? "Update otomatis mengikuti WIB.").toString().trim();
+
+  if ($("#marqueeText")) $("#marqueeText").textContent = SITE_MARQUEE_TEXT;
+  if ($("#marqueeText2")) $("#marqueeText2").textContent = SITE_MARQUEE_TEXT;
+
+  // tombol refresh diganti jadi CTA login
+  if ($("#btnRefresh")) $("#btnRefresh").textContent = "PASANG ANGKA SEKARANG";
 }
 
 /* ============================= */
-/* Load Markets */
+/* Markets */
 /* ============================= */
 async function loadMarkets() {
   const r = await fetch("/api/markets");
@@ -127,7 +141,6 @@ async function loadPrediction(marketId, silent = false) {
   if ($("#panelDate")) $("#panelDate").textContent = `${data.wib.prettyDate} WIB`;
   if ($("#wibClock")) $("#wibClock").textContent = data.wib.prettyDate;
 
-  // yang ini tetap isi kalau elemen ada
   if ($("#panelShio")) $("#panelShio").textContent = data.cards?.shio ?? "-";
 
   if ($("#tTanggal")) $("#tTanggal").textContent = data.cards?.tanggal ?? "-";
@@ -145,9 +158,9 @@ async function loadPrediction(marketId, silent = false) {
     $("#bannerText").textContent = `Update: ${data.market} • ${data.wib.prettyDate} WIB`;
   }
 
-  // optional: kalau kamu mau running text ikut update otomatis (kalau elemen marquee ada)
-  if ($("#marqueeText")) $("#marqueeText").textContent = `Update: ${data.market} • ${data.wib.prettyDate} WIB`;
-  if ($("#marqueeText2")) $("#marqueeText2").textContent = `Update: ${data.market} • ${data.wib.prettyDate} WIB`;
+  // ✅ jangan overwrite marquee (tetap pakai setting admin)
+  if ($("#marqueeText")) $("#marqueeText").textContent = SITE_MARQUEE_TEXT || $("#marqueeText").textContent;
+  if ($("#marqueeText2")) $("#marqueeText2").textContent = SITE_MARQUEE_TEXT || $("#marqueeText2").textContent;
 }
 
 /* ============================= */
@@ -171,19 +184,32 @@ function buildCopyText(d) {
 }
 
 /* ============================= */
+/* Open Login URL */
+/* ============================= */
+function openLogin() {
+  const url = SITE_LOGIN_URL || $("#linkLogin")?.href || "#";
+  if (!url || url === "#") {
+    if ($("#bannerText")) $("#bannerText").textContent = "Link LOGIN belum di-set di Admin.";
+    return;
+  }
+  window.open(url, "_blank", "noopener");
+}
+
+/* ============================= */
 /* Init */
 /* ============================= */
 document.addEventListener("DOMContentLoaded", async () => {
   await loadSite();
   await loadMarkets();
 
-  hidePanel(); // <- penting: awal halaman panel disembunyikan
+  hidePanel();
 
+  // drawer
   if ($("#btnMenu")) $("#btnMenu").addEventListener("click", () => setDrawer(true));
   if ($("#btnClose")) $("#btnClose").addEventListener("click", () => setDrawer(false));
   if ($("#mask")) $("#mask").addEventListener("click", () => setDrawer(false));
 
-  // klik search: kalau ketemu, pilih market tapi jangan auto load (user tetap klik LIHAT)
+  // search: pilih market saja
   if ($("#btnSearch")) {
     $("#btnSearch").addEventListener("click", () => {
       const q = ($("#search")?.value || "").trim().toLowerCase();
@@ -201,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // kalau user ganti dropdown, update logo + banner (tanpa load)
+  // dropdown change
   if ($("#market")) {
     $("#market").addEventListener("change", () => {
       const id = $("#market").value;
@@ -216,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // tombol LIHAT = baru load prediction dan tampilkan panel
+  // LIHAT
   if ($("#btnLoad")) {
     $("#btnLoad").addEventListener("click", () => {
       const id = $("#market").value;
@@ -231,13 +257,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // ✅ Tombol bawah kiri: PASANG ANGKA SEKARANG (arah ke login)
   if ($("#btnRefresh")) {
     $("#btnRefresh").addEventListener("click", () => {
-      if (!started || !lastMarketId) return;
-      loadPrediction(lastMarketId);
+      openLogin();
     });
   }
 
+  // Copy
   if ($("#btnCopy")) {
     $("#btnCopy").addEventListener("click", async () => {
       if (!lastData) return;
@@ -250,7 +277,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // auto refresh: hanya jalan setelah user klik LIHAT (started) & data sudah ada
+  // OPTIONAL refresh data tanpa nambah tombol:
+  // double click banner untuk refresh prediction
+  if ($("#bannerText")) {
+    $("#bannerText").addEventListener("dblclick", () => {
+      if (!started || !lastMarketId) return;
+      loadPrediction(lastMarketId);
+    });
+  }
+
+  // auto refresh: hanya jalan setelah user klik LIHAT
   setInterval(() => {
     if (started && lastMarketId && lastData) loadPrediction(lastMarketId, true);
   }, 15000);
