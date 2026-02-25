@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>WDBOS Dashboard</title>
+  <title>WDBANDAR</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="./styles.css" />
 </head>
+
 <body>
   <!-- TOPBAR -->
   <header class="top" id="top">
@@ -18,8 +18,8 @@
       <a class="brand" href="/">
         <img id="siteLogo" class="brand-logo" src="https://via.placeholder.com/44x44.png?text=W" alt="Logo">
         <div class="brand-text">
-          <div class="brand-name" id="siteTitle">WDBOS</div>
-          <div class="brand-sub">Dashboard</div>
+          <div class="brand-name" id="siteTitle">WDBANDAR</div>
+          <div class="brand-sub">Official</div>
         </div>
       </a>
 
@@ -39,50 +39,48 @@
         <div class="drawer-title">MENU</div>
         <button id="btnClose" class="icon-btn" aria-label="Close">✕</button>
       </div>
+
       <nav class="drawer-nav">
+        <a href="https://prediksibolawdbandar.xyz" target="_blank" rel="noopener">PREDIKSI BOLA</a>
+        <a href="https://prediksibolawdbandar.store/" target="_blank" rel="noopener">BUKTI PEMBAYARAN</a>
+
         <a id="linkLogin" href="#" target="_blank" rel="noopener">LOGIN</a>
         <a id="linkDaftar" href="#" target="_blank" rel="noopener">DAFTAR</a>
+
         <a href="/admin">ADMIN</a>
-        <a href="#main">DASHBOARD</a>
+        <a href="#main">HOME</a>
         <a href="#bottom">INFO</a>
       </nav>
     </div>
   </aside>
   <div id="mask" class="mask" hidden></div>
 
-  <!-- STAGE 3-COLUMN -->
-  <main class="stage" id="main">
-    <!-- left panel -->
-    <section class="side side-left" aria-hidden="true">
-      <img id="bgLeft" class="side-img" src="" alt="">
-      <div class="side-glow"></div>
-    </section>
+  <!-- MAIN (1 background only) -->
+  <main class="single" id="main">
+    <div class="single-overlay"></div>
 
-    <!-- center -->
     <section class="mid">
       <div class="mid-wrap">
         <div class="hero">
-          <div class="hero-kicker">DASHBOARD</div>
-          <h1 class="hero-title">PREDIKSI ANGKA<br>HIBURAN</h1>
+          <div class="hero-kicker">WDBANDAR</div>
 
+          <h1 class="hero-title">PREDIKSI<br>HIBURAN</h1>
+
+          <!-- TANGGAL SAJA (tanpa jam) -->
           <div class="hero-meta">
-            <span class="meta-label">WIB</span>
-            <span class="meta-dot">•</span>
-            <span class="meta-pill" id="wibClock">--:--:--</span>
+            <span class="meta-pill" id="wibClock">Kamis, 26 Februari 2026</span>
           </div>
         </div>
 
         <div class="card card-main">
           <div class="card-head">
             <div>
-              <div class="card-title">Panel Angka Otomatis</div>
-              <div class="card-sub">Update otomatis mengikuti tanggal WIB (Asia/Jakarta).</div>
+              <div class="card-title">Panel Otomatis</div>
+              <div class="card-sub">Update otomatis sesuai tanggal WIB.</div>
             </div>
           </div>
 
-          <div class="banner" id="bannerText">
-            📢 Update otomatis harian (WIB)
-          </div>
+          <div class="banner" id="bannerText">📢 Update otomatis harian (WIB)</div>
 
           <div class="form">
             <div class="label">Pilih Pasaran</div>
@@ -168,22 +166,16 @@
         <div class="card card-info">
           <div class="info-head">
             <span class="info-ic">i</span>
-            <div class="info-title">Informasi Penting</div>
+            <div class="info-title">Informasi</div>
           </div>
-          <p class="info-text" id="disclaimerText">Konten hiburan/demonstrasi UI. Bukan ajakan berjudi.</p>
+          <p class="info-text" id="disclaimerText">Konten hiburan/demonstrasi UI.</p>
         </div>
 
         <footer class="foot" id="bottom">
-          <div class="foot-left">© 2026 Dashboard</div>
+          <div class="foot-left">© 2026 WDBANDAR</div>
           <a class="foot-top" href="#top">To the top ↑</a>
         </footer>
       </div>
-    </section>
-
-    <!-- right panel -->
-    <section class="side side-right" aria-hidden="true">
-      <img id="bgRight" class="side-img" src="" alt="">
-      <div class="side-glow"></div>
     </section>
   </main>
 
