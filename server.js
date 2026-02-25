@@ -43,20 +43,33 @@ function getSetting(key, fallback = "") {
   return row?.value ?? fallback;
 }
 function setSetting(key, value) {
-  db.prepare("INSERT INTO site_settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value")
-    .run(key, String(value ?? ""));
+  db.prepare(
+    "INSERT INTO site_settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value"
+  ).run(key, String(value ?? ""));
 }
 
 function seedDefaults() {
-  // site defaults
   if (!getSetting("site_title")) setSetting("site_title", "WDBOS Dashboard");
   if (!getSetting("site_logo_url")) setSetting("site_logo_url", "https://via.placeholder.com/44x44.png?text=W");
-  if (!getSetting("bg_left_url")) setSetting("bg_left_url", "https://images.unsplash.com/photo-1520975958225-b561dc06f3f5?q=80&w=1100&auto=format&fit=crop");
-  if (!getSetting("bg_right_url")) setSetting("bg_right_url", "https://images.unsplash.com/photo-1614851099511-773084e7c7b0?q=80&w=1100&auto=format&fit=crop");
+
+  // background 1 saja: pakai bg_left_url sebagai background utama
+  if (!getSetting("bg_left_url")) {
+    setSetting(
+      "bg_left_url",
+      "https://images.unsplash.com/photo-1520975958225-b561dc06f3f5?q=80&w=1100&auto=format&fit=crop"
+    );
+  }
+  // biar admin lama tidak rusak, tetap ada field ini (opsional)
+  if (!getSetting("bg_right_url")) {
+    setSetting(
+      "bg_right_url",
+      "https://images.unsplash.com/photo-1614851099511-773084e7c7b0?q=80&w=1100&auto=format&fit=crop"
+    );
+  }
+
   if (!getSetting("link_login")) setSetting("link_login", "#");
   if (!getSetting("link_daftar")) setSetting("link_daftar", "#");
 
-  // markets defaults
   const count = db.prepare("SELECT COUNT(*) c FROM markets").get().c;
   if (count === 0) {
     const ins = db.prepare("INSERT INTO markets(id,name,logo_url,sort_order) VALUES(?,?,?,?)");
@@ -67,34 +80,27 @@ function seedDefaults() {
 }
 seedDefaults();
 
-// ===== Helpers WIB =====
-function wibParts(date = new Date()) {
-  const fmt = new Intl.DateTimeFormat("id-ID", {
+// ===== Date helpers (WIB) =====
+function wibDateKey(date = new Date()) {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: TZ,
     year: "numeric",
     month: "2-digit",
-    day: "2-digit",
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23"
+    day: "2-digit"
   });
-  const parts = fmt.formatToParts(date);
-  const get = (t) => parts.find(p => p.type === t)?.value || "";
-  const yyyy = get("year");
-  const mm = get("month");
-  const dd = get("day");
-  const weekday = get("weekday");
-  const HH = get("hour");
-  const MM = get("minute");
-  const SS = get("second");
-  return {
-    yyyy, mm, dd, weekday, HH, MM, SS,
-    dateKey: `${yyyy}-${mm}-${dd}`,
-    time: `${HH}:${MM}:${SS}`,
-    prettyDate: `${weekday}, ${dd}-${mm}-${yyyy}`
-  };
+  // en-CA => YYYY-MM-DD
+  return fmt.format(date);
+}
+
+function prettyDateLongWIB(date = new Date()) {
+  // contoh: "Kamis, 26 Februari 2026"
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: TZ,
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  }).format(date);
 }
 
 // ===== Deterministic generator (hiburan) =====
@@ -111,6 +117,7 @@ function xmur3(str) {
     return h >>> 0;
   };
 }
+
 function mulberry32(a) {
   return function () {
     let t = (a += 0x6D2B79F5);
@@ -119,19 +126,29 @@ function mulberry32(a) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
 function pickUnique(rand, count, max) {
   const set = new Set();
   while (set.size < count) set.add(Math.floor(rand() * max));
   return [...set];
 }
-const SHIO = ["TIKUS","KERBAU","HARIMAU","KELINCI","NAGA","ULAR","KUDA","KAMBING","MONYET","AYAM","ANJING","BABI"];
+
+// SHIO urutan sesuai request user
+const SHIO = [
+  "KUDA","ULAR","NAGA","KELINCI","HARIMAU","KERBAU",
+  "TIKUS","BABI","ANJING","AYAM","MONYET","KAMBING"
+];
+
 function shioFromNumber(n) {
   const idx = ((n % 12) + 12) % 12;
   return SHIO[idx];
 }
 
 function buildPrediction(marketName = "HONGKONG") {
-  const { dateKey, prettyDate, time } = wibParts(new Date());
+  const now = new Date();
+  const dateKey = wibDateKey(now);
+  const prettyDate = prettyDateLongWIB(now);
+
   const name = String(marketName || "HONGKONG").toUpperCase().trim();
   const seed = `${dateKey}|${name}|WIB`;
   const seedFn = xmur3(seed);
@@ -145,11 +162,16 @@ function buildPrediction(marketName = "HONGKONG") {
   const makeList = (len, mod, pad) =>
     Array.from({ length: len }, () => String(Math.floor(rand() * mod)).padStart(pad, "0"));
 
+  // twin selalu kembar digit: contoh "44 / 88"
+  const a = Math.floor(rand() * 10);
+  const b = Math.floor(rand() * 10);
+  const twin = `${a}${a} / ${b}${b}`;
+
   return {
     market: name,
-    wib: { dateKey, prettyDate, time, tz: TZ },
+    wib: { dateKey, prettyDate, tz: TZ }, // <-- tanpa jam
     cards: {
-      tanggal: prettyDate,
+      tanggal: prettyDate, // <-- contoh: Kamis, 26 Februari 2026
       bbfs_kuat: bbfs,
       angka_ikut: angkaIkut,
       shio,
@@ -158,7 +180,7 @@ function buildPrediction(marketName = "HONGKONG") {
       d2: makeList(12, 100, 2),
       colok_bebas: pickUnique(rand, 2, 10).join(" / "),
       colok_macau: makeList(3, 100, 2).join(" / "),
-      twin: `${String(Math.floor(rand() * 100)).padStart(2, "0")} / ${String(Math.floor(rand() * 100)).padStart(2, "0")}`,
+      twin,
       syair: [
         "Kisah angka tak pernah berakhir, setiap detik, harapan menyala.",
         "Langkah kecil hari ini, jadi cerita besar esok hari.",
@@ -175,18 +197,24 @@ function signToken(payload) {
   const sig = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
   return `${body}.${sig}`;
 }
+
 function verifyToken(token) {
   if (!token || typeof token !== "string") return null;
   const [body, sig] = token.split(".");
   if (!body || !sig) return null;
   const expSig = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expSig))) return null;
+  try {
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expSig))) return null;
+  } catch {
+    return null;
+  }
   try {
     return JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
   } catch {
     return null;
   }
 }
+
 function requireAdmin(req, res, next) {
   const t = req.cookies?.admin_token;
   const data = verifyToken(t);
@@ -206,7 +234,9 @@ app.get("/api/site", (_req, res) => {
   res.json({
     site_title: getSetting("site_title", "WDBOS Dashboard"),
     site_logo_url: getSetting("site_logo_url", ""),
+    // background satu saja: pakai bg_left_url sebagai background utama
     bg_left_url: getSetting("bg_left_url", ""),
+    // tetap kirim ini agar admin lama tidak error (boleh diabaikan frontend)
     bg_right_url: getSetting("bg_right_url", ""),
     link_login: getSetting("link_login", "#"),
     link_daftar: getSetting("link_daftar", "#")
@@ -214,7 +244,9 @@ app.get("/api/site", (_req, res) => {
 });
 
 app.get("/api/markets", (_req, res) => {
-  const rows = db.prepare("SELECT id,name,logo_url,sort_order FROM markets ORDER BY sort_order ASC, name ASC").all();
+  const rows = db
+    .prepare("SELECT id,name,logo_url,sort_order FROM markets ORDER BY sort_order ASC, name ASC")
+    .all();
   res.json(rows);
 });
 
@@ -250,7 +282,7 @@ app.post("/api/admin/login", (req, res) => {
   res.json({ ok: true });
 });
 
-app.post("/api/admin/logout", (req, res) => {
+app.post("/api/admin/logout", (_req, res) => {
   res.clearCookie("admin_token");
   res.json({ ok: true });
 });
@@ -268,12 +300,14 @@ app.post("/api/admin/site", requireAdmin, (req, res) => {
 });
 
 function slugifyId(s) {
-  return String(s || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 40) || crypto.randomBytes(4).toString("hex");
+  return (
+    String(s || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 40) || crypto.randomBytes(4).toString("hex")
+  );
 }
 
 app.post("/api/admin/markets", requireAdmin, (req, res) => {
@@ -310,6 +344,5 @@ app.delete("/api/admin/markets/:id", requireAdmin, (req, res) => {
 });
 
 app.listen(PORT, () => {
-  const { prettyDate, time } = wibParts(new Date());
-  console.log(`Server :${PORT} | WIB: ${prettyDate} ${time}`);
+  console.log(`Server :${PORT} | TZ: ${TZ}`);
 });
