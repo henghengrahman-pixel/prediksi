@@ -59,7 +59,7 @@ function seedDefaults() {
       "https://images.unsplash.com/photo-1520975958225-b561dc06f3f5?q=80&w=1100&auto=format&fit=crop"
     );
   }
-  // biar admin lama tidak rusak, tetap ada field ini (opsional)
+  // opsional (biar admin lama tidak rusak)
   if (!getSetting("bg_right_url")) {
     setSetting(
       "bg_right_url",
@@ -69,6 +69,9 @@ function seedDefaults() {
 
   if (!getSetting("link_login")) setSetting("link_login", "#");
   if (!getSetting("link_daftar")) setSetting("link_daftar", "#");
+
+  // optional running text jika kamu pakai marquee
+  if (!getSetting("marquee_text")) setSetting("marquee_text", "Update otomatis mengikuti tanggal WIB.");
 
   const count = db.prepare("SELECT COUNT(*) c FROM markets").get().c;
   if (count === 0) {
@@ -88,8 +91,7 @@ function wibDateKey(date = new Date()) {
     month: "2-digit",
     day: "2-digit"
   });
-  // en-CA => YYYY-MM-DD
-  return fmt.format(date);
+  return fmt.format(date); // YYYY-MM-DD
 }
 
 function prettyDateLongWIB(date = new Date()) {
@@ -133,16 +135,69 @@ function pickUnique(rand, count, max) {
   return [...set];
 }
 
-// SHIO urutan sesuai request user
+// ===== SHIO (urutan sesuai request) =====
 const SHIO = [
   "KUDA","ULAR","NAGA","KELINCI","HARIMAU","KERBAU",
   "TIKUS","BABI","ANJING","AYAM","MONYET","KAMBING"
 ];
-
 function shioFromNumber(n) {
   const idx = ((n % 12) + 12) % 12;
   return SHIO[idx];
 }
+
+// ===== Syair bank (banyak) =====
+// (Teks netral / motivasi, berubah tiap pasaran & hari via seed rand)
+const SYAIR_BANK = [
+  "Hari baru, fokus baru. Gas pelan tapi pasti.",
+  "Tenang dulu—yang rapi biasanya menang di konsistensi.",
+  "Jangan buru-buru. Baca situasi, baru ambil langkah.",
+  "Yang penting disiplin, bukan terburu nafsu.",
+  "Kalau hari ini belum sesuai, besok masih ada peluang perbaikan.",
+  "Sabar itu strategi. Panik itu musuh.",
+  "Fokus ke proses, hasil mengikuti arah.",
+  "Rapiin dulu plan, baru jalan.",
+  "Yang konsisten pelan-pelan jadi besar.",
+  "Semangat boleh tinggi, tapi keputusan harus dingin.",
+  "Kalau capek, istirahat. Jangan hilang arah.",
+  "Hari ini belajar, besok naik level.",
+  "Jangan lawan arus kalau belum siap.",
+  "Kunci hari ini: tenang, teliti, tuntas.",
+  "Kecil-kecil asal stabil, jauh lebih aman.",
+  "Bukan soal cepat, tapi soal tepat.",
+  "Yang penting kontrol diri, bukan ikut ramai.",
+  "Pelan itu bukan kalah, pelan itu aman.",
+  "Jaga ritme, jangan kebawa suasana.",
+  "Langkah kecil yang benar lebih baik dari lari tapi salah.",
+  "Hari ini buktikan kamu bisa konsisten.",
+  "Kalau bingung, balik ke rencana awal.",
+  "Yang penting tetap waras dan rasional.",
+  "Jangan overthinking—tetap pakai logika.",
+  "Biar lambat, asal nggak nyasar.",
+  "Kunci sukses: sabar + disiplin + evaluasi.",
+  "Kalau gagal, itu data. Bukan akhir cerita.",
+  "Jangan kejar sempurna, kejar progres.",
+  "Satu langkah benar lebih bagus dari seribu teori.",
+  "Hari ini rapi, besok tinggal lanjut.",
+  "Hoki itu bonus. Skill itu fondasi.",
+  "Jangan takut reset kalau memang perlu.",
+  "Biar nggak banyak, yang penting konsisten.",
+  "Lihat pola, bukan emosi.",
+  "Jangan bandingin, fokus ke progress kamu.",
+  "Kalau perlu, mundur selangkah buat maju dua langkah.",
+  "Niat baik, aksi rapi, hasil menyusul.",
+  "Pelan-pelan asal jalan, lebih bagus dari diam.",
+  "Kesabaran itu kekuatan yang sering diremehkan.",
+  "Yang stabil lebih sulit dikalahkan daripada yang cepat.",
+  "Hari ini: jaga fokus, jaga energi.",
+  "Lakukan yang bisa kamu kontrol.",
+  "Jangan biarkan mood ngatur keputusan.",
+  "Kalau ragu, tahan dulu.",
+  "Sikap tenang bikin kamu lebih tajam.",
+  "Kuat itu bukan keras, tapi tahan banting.",
+  "Yang penting bukan ramai, tapi benar.",
+  "Upgrade diri sedikit demi sedikit.",
+  "Cerdas itu tahu kapan berhenti."
+];
 
 function buildPrediction(marketName = "HONGKONG") {
   const now = new Date();
@@ -150,6 +205,8 @@ function buildPrediction(marketName = "HONGKONG") {
   const prettyDate = prettyDateLongWIB(now);
 
   const name = String(marketName || "HONGKONG").toUpperCase().trim();
+
+  // seed = beda tiap pasaran + beda tiap hari
   const seed = `${dateKey}|${name}|WIB`;
   const seedFn = xmur3(seed);
   const rand = mulberry32(seedFn());
@@ -162,16 +219,18 @@ function buildPrediction(marketName = "HONGKONG") {
   const makeList = (len, mod, pad) =>
     Array.from({ length: len }, () => String(Math.floor(rand() * mod)).padStart(pad, "0"));
 
-  // twin selalu kembar digit: contoh "44 / 88"
+  // twin kembar digit: "44 / 88"
   const a = Math.floor(rand() * 10);
   const b = Math.floor(rand() * 10);
   const twin = `${a}${a} / ${b}${b}`;
 
+  const syair = SYAIR_BANK[Math.floor(rand() * SYAIR_BANK.length)];
+
   return {
     market: name,
-    wib: { dateKey, prettyDate, tz: TZ }, // <-- tanpa jam
+    wib: { dateKey, prettyDate, tz: TZ },
     cards: {
-      tanggal: prettyDate, // <-- contoh: Kamis, 26 Februari 2026
+      tanggal: prettyDate,
       bbfs_kuat: bbfs,
       angka_ikut: angkaIkut,
       shio,
@@ -181,13 +240,9 @@ function buildPrediction(marketName = "HONGKONG") {
       colok_bebas: pickUnique(rand, 2, 10).join(" / "),
       colok_macau: makeList(3, 100, 2).join(" / "),
       twin,
-      syair: [
-        "Kisah angka tak pernah berakhir, setiap detik, harapan menyala.",
-        "Langkah kecil hari ini, jadi cerita besar esok hari.",
-        "Tenang, fokus, dan konsisten—hasil mengikuti arah."
-      ][Math.floor(rand() * 3)]
+      syair
     },
-    disclaimer: "Konten hiburan/demonstrasi UI. Bukan ajakan berjudi."
+    disclaimer: "Konten hiburan/demonstrasi UI."
   };
 }
 
@@ -234,12 +289,11 @@ app.get("/api/site", (_req, res) => {
   res.json({
     site_title: getSetting("site_title", "WDBOS Dashboard"),
     site_logo_url: getSetting("site_logo_url", ""),
-    // background satu saja: pakai bg_left_url sebagai background utama
     bg_left_url: getSetting("bg_left_url", ""),
-    // tetap kirim ini agar admin lama tidak error (boleh diabaikan frontend)
     bg_right_url: getSetting("bg_right_url", ""),
     link_login: getSetting("link_login", "#"),
-    link_daftar: getSetting("link_daftar", "#")
+    link_daftar: getSetting("link_daftar", "#"),
+    marquee_text: getSetting("marquee_text", "")
   });
 });
 
@@ -276,7 +330,7 @@ app.post("/api/admin/login", (req, res) => {
   res.cookie("admin_token", token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: true, // Railway https
+    secure: true,
     maxAge: 1000 * 60 * 60 * 6
   });
   res.json({ ok: true });
@@ -292,7 +346,7 @@ app.get("/api/admin/me", requireAdmin, (_req, res) => res.json({ ok: true }));
 
 app.post("/api/admin/site", requireAdmin, (req, res) => {
   const b = req.body || {};
-  const keys = ["site_title","site_logo_url","bg_left_url","bg_right_url","link_login","link_daftar"];
+  const keys = ["site_title","site_logo_url","bg_left_url","bg_right_url","link_login","link_daftar","marquee_text"];
   for (const k of keys) {
     if (k in b) setSetting(k, b[k]);
   }
