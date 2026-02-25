@@ -1,9 +1,3 @@
-// public/admin.js (FIX LENGKAP)
-// - Tambah setting RUNNING TEXT: marquee_text
-// - Background cuma 1 (pakai bg_left_url), bg_right_url di-reset ""
-// - credentials include (cookie session)
-// - Error handling aman (json/text)
-
 const $ = (s) => document.querySelector(s);
 
 async function api(url, opts = {}) {
@@ -23,7 +17,6 @@ async function api(url, opts = {}) {
   }
 
   if (!r.ok) {
-    // normalisasi error supaya #msg tampil enak
     const msg =
       (typeof body === "object" && body && (body.error || body.message)) ? (body.error || body.message)
       : (typeof body === "string" && body.trim() ? body.trim()
@@ -35,7 +28,26 @@ async function api(url, opts = {}) {
 }
 
 function show(el, yes) { if (el) el.hidden = !yes; }
-function setMsg(id, text) { const el = $(id); if (el) el.textContent = text || ""; }
+function setMsg(sel, text) { const el = $(sel); if (el) el.textContent = text || ""; }
+
+/* =======================================
+   Support login UI baru (PINK TIGER)
+   - set logo dari /api/site ke <img class="logo-img">
+   - set judul di <title> juga optional
+======================================= */
+async function hydrateLoginBrand() {
+  try {
+    const s = await api("/api/site");
+    // kalau admin.html punya logo image
+    const img = document.querySelector(".logo-img");
+    if (img && s.site_logo_url) img.src = s.site_logo_url;
+
+    // optional: ganti title admin
+    if (s.site_title) document.title = `${s.site_title} • Admin`;
+  } catch {
+    // ignore (admin page masih bisa dipakai tanpa ini)
+  }
+}
 
 async function checkLogin() {
   try { await api("/api/admin/me"); return true; } catch { return false; }
@@ -50,19 +62,24 @@ async function loadSiteIntoForm() {
   // ✅ 1 background: pakai bg_left_url
   $("#bg_left_url").value = s.bg_left_url || "";
 
-  // ✅ running text
-  // support 2 kemungkinan nama field (biar kompatibel)
+  // ✅ running text (compat: marquee_text / marqueeText)
   const mt = s.marquee_text ?? s.marqueeText ?? "";
   const el = $("#marquee_text");
   if (el) el.value = mt || "";
 
   $("#link_login").value = s.link_login || "";
   $("#link_daftar").value = s.link_daftar || "";
+
+  // sync logo login juga (biar kalau baru disave, login screen ikut berubah)
+  const img = document.querySelector(".logo-img");
+  if (img && s.site_logo_url) img.src = s.site_logo_url;
 }
 
 async function loadMarketsTable() {
   const rows = await api("/api/markets");
   const tb = $("#marketRows");
+  if (!tb) return;
+
   tb.innerHTML = "";
 
   for (const m of rows) {
@@ -118,15 +135,31 @@ async function loadMarketsTable() {
   });
 }
 
+function showPanelWrapIfAny() {
+  const wrap = $("#panelWrap");
+  if (wrap) wrap.hidden = false;
+}
+
 async function enterPanel() {
+  // login screen (section) pakai id loginCard
   show($("#loginCard"), false);
+
+  // panel wrapper (kalau ada di admin.html baru)
+  showPanelWrapIfAny();
+
+  // panel lama
   show($("#panelCard"), true);
   show($("#marketsCard"), true);
+
   await loadSiteIntoForm();
   await loadMarketsTable();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // set logo login dari /api/site (kalau ada)
+  await hydrateLoginBrand();
+
+  // auto enter kalau sudah login
   if (await checkLogin()) await enterPanel();
 
   $("#btnLogin")?.addEventListener("click", async () => {
@@ -134,7 +167,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       await api("/api/admin/login", {
         method: "POST",
-        body: JSON.stringify({ id: $("#aid").value, password: $("#apw").value })
+        body: JSON.stringify({
+          id: ($("#aid")?.value || "").trim(),
+          password: ($("#apw")?.value || "")
+        })
       });
       setMsg("#loginMsg", "Login sukses ✅");
       await enterPanel();
@@ -172,6 +208,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
       });
       setMsg("#siteMsg", "Tersimpan ✅ (cek halaman utama)");
+
+      // refresh form supaya sinkron + logo login ikut update
+      await loadSiteIntoForm();
     } catch (e) {
       setMsg("#siteMsg", `Gagal: ${e?.error || e}`);
     }
@@ -179,9 +218,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   $("#btnAddMarket")?.addEventListener("click", async () => {
     setMsg("#marketMsg", "");
-    const name = $("#m_name").value.trim();
-    const logo_url = $("#m_logo").value.trim();
-    const sort_order = Number($("#m_sort").value || 0);
+    const name = ($("#m_name")?.value || "").trim();
+    const logo_url = ($("#m_logo")?.value || "").trim();
+    const sort_order = Number($("#m_sort")?.value || 0);
 
     if (!name || !logo_url) {
       setMsg("#marketMsg", "Nama & Logo URL wajib diisi");
