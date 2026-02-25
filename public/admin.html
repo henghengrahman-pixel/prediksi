@@ -4,56 +4,119 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#07101f;color:#eaf0ff}
+    :root{
+      --bg:#07101f;
+      --card:rgba(8,22,40,.86);
+      --line:rgba(255,255,255,.10);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+      --btn:rgba(47,139,255,.90);
+      --ghost:rgba(255,255,255,.06);
+      --danger:rgba(255,90,90,.20);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
     .wrap{max-width:980px;margin:0 auto;padding:18px}
-    .card{border:1px solid rgba(255,255,255,.10);background:rgba(8,22,40,.86);border-radius:14px;padding:14px;margin-bottom:12px}
+    .card{border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px}
     h1{margin:0 0 8px;font-size:20px}
     h2{margin:0 0 10px;font-size:16px}
+    .mini{font-size:12px;color:var(--muted)}
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .col{flex:1;min-width:240px}
-    label{display:block;font-size:12px;opacity:.8;margin:0 0 6px;font-weight:700}
-    input{width:100%;padding:10px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.06);color:#eaf0ff;outline:none}
-    button{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:rgba(47,139,255,.85);font-weight:800;cursor:pointer}
-    .ghost{background:rgba(255,255,255,.06)}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:8px;font-size:13px;text-align:left;vertical-align:top}
-    .mini{font-size:12px;opacity:.8}
-    .logo{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.10);object-fit:cover;background:rgba(255,255,255,.06)}
-    .msg{margin-top:10px;font-size:13px;opacity:.9}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:800}
+    input{
+      width:100%;padding:10px 10px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.06);color:var(--text);outline:none
+    }
+    input:focus{border-color:rgba(47,139,255,.65);box-shadow:0 0 0 3px rgba(47,139,255,.12)}
+    button{
+      padding:10px 12px;border-radius:12px;border:1px solid var(--line);
+      background:var(--btn);font-weight:900;cursor:pointer;color:var(--text)
+    }
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .ghost{background:var(--ghost)}
+    .danger{background:var(--danger)}
+    a{color:var(--text);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .bar{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap
+    }
+
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border-bottom:1px solid var(--line);padding:10px 8px;font-size:13px;text-align:left;vertical-align:top}
+    th{color:var(--muted);font-weight:900}
+    .msg{margin-top:10px;font-size:13px;opacity:.95}
+    .logo{width:34px;height:34px;border-radius:999px;border:1px solid var(--line);object-fit:cover;background:rgba(255,255,255,.06)}
+    .pill{
+      display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.06);font-weight:800;font-size:12px
+    }
+    .pill--num{min-width:44px;text-align:center}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .rowActions{display:flex;gap:8px;flex-wrap:wrap}
+    .td-logo{width:60px}
+    .td-id{width:80px}
+    .td-sort{width:80px}
+    .td-actions{width:200px}
+
+    /* inline edit UI (match admin.js) */
+    .edit .inp{margin:0 0 8px}
+    .edit .inp:last-child{margin-bottom:0}
+    .inp{width:100%}
+    .inp--num{max-width:120px}
+
+    /* mobile */
+    @media (max-width:720px){
+      .wrap{padding:12px}
+      .col{min-width:100%}
+      .td-actions{width:auto}
+      th:nth-child(2), td.td-id{white-space:nowrap}
+      .rowActions button{padding:10px 10px}
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card">
       <h1>Admin Panel</h1>
-      <div class="mini">Login pakai ADMIN_ID & ADMIN_PASSWORD (Railway Variables)</div>
+      <div class="mini">Login pakai <b>ADMIN_ID</b> & <b>ADMIN_PASSWORD</b> (Railway Variables)</div>
     </div>
 
+    <!-- LOGIN -->
     <div class="card" id="loginCard">
       <h2>Login</h2>
       <div class="row">
         <div class="col">
           <label>Admin ID</label>
-          <input id="aid" placeholder="ADMIN_ID">
+          <input id="aid" placeholder="ADMIN_ID" autocomplete="username">
         </div>
         <div class="col">
           <label>Password</label>
-          <input id="apw" type="password" placeholder="ADMIN_PASSWORD">
+          <input id="apw" type="password" placeholder="ADMIN_PASSWORD" autocomplete="current-password">
         </div>
       </div>
-      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <button id="btnLogin">Login</button>
-        <a href="/" style="color:#eaf0ff;align-self:center">← Back</a>
+        <a href="/">← Back</a>
       </div>
+
       <div class="msg" id="loginMsg"></div>
     </div>
 
+    <!-- SITE SETTINGS -->
     <div class="card" id="panelCard" hidden>
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="bar">
         <h2>Site Settings</h2>
         <button class="ghost" id="btnLogout">Logout</button>
       </div>
@@ -61,44 +124,48 @@
       <div class="row">
         <div class="col">
           <label>Site Title</label>
-          <input id="site_title">
+          <input id="site_title" placeholder="Judul site">
         </div>
         <div class="col">
           <label>Logo URL</label>
-          <input id="site_logo_url">
+          <input id="site_logo_url" placeholder="https://...png">
         </div>
       </div>
 
       <div class="row" style="margin-top:10px">
         <div class="col">
           <label>Background Left URL</label>
-          <input id="bg_left_url">
+          <input id="bg_left_url" placeholder="https://...webp">
         </div>
         <div class="col">
           <label>Background Right URL</label>
-          <input id="bg_right_url">
+          <input id="bg_right_url" placeholder="https://...webp">
         </div>
       </div>
 
       <div class="row" style="margin-top:10px">
         <div class="col">
           <label>Link Login</label>
-          <input id="link_login">
+          <input id="link_login" placeholder="https://...">
         </div>
         <div class="col">
           <label>Link Daftar</label>
-          <input id="link_daftar">
+          <input id="link_daftar" placeholder="https://...">
         </div>
       </div>
 
-      <div style="margin-top:10px">
+      <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <button id="btnSaveSite">Simpan Settings</button>
         <span class="msg" id="siteMsg"></span>
       </div>
     </div>
 
+    <!-- MARKETS -->
     <div class="card" id="marketsCard" hidden>
-      <h2>Markets / Pasaran</h2>
+      <div class="bar">
+        <h2>Markets / Pasaran</h2>
+        <div class="mini">Klik <b>Edit</b> untuk ubah inline, lalu <b>Simpan</b>.</div>
+      </div>
 
       <div class="row">
         <div class="col">
@@ -111,10 +178,11 @@
         </div>
         <div class="col">
           <label>Sort Order (angka)</label>
-          <input id="m_sort" placeholder="1">
+          <input id="m_sort" type="number" placeholder="1" min="-9999" max="9999">
         </div>
       </div>
-      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <button id="btnAddMarket">Tambah</button>
         <span class="msg" id="marketMsg"></span>
       </div>
@@ -134,6 +202,6 @@
     </div>
   </div>
 
-  <script src="./admin.js"></script>
+  <script src="/admin.js"></script>
 </body>
 </html>
