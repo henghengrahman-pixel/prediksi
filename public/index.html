@@ -3,21 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Dashboard</title>
+  <title>WDBOS Dashboard</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <!-- TOPBAR -->
   <header class="top" id="top">
     <div class="top-inner">
-      <a class="brand" href="#">
+      <a class="brand" href="/">
         <img id="siteLogo" class="brand-logo" src="https://via.placeholder.com/44x44.png?text=W" alt="Logo">
-        <div class="brand-mark" id="siteTitle">WDBOS</div>
+        <div class="brand-text">
+          <div class="brand-name" id="siteTitle">WDBOS</div>
+          <div class="brand-sub">Dashboard</div>
+        </div>
       </a>
 
-      <div class="top-ss">
+      <div class="top-search">
         <input id="search" type="search" class="sea" placeholder="Search pasaran..." />
         <button id="btnSearch" class="icon-btn" aria-label="Search">⌕</button>
       </div>
@@ -26,6 +32,7 @@
     </div>
   </header>
 
+  <!-- DRAWER -->
   <aside id="drawer" class="drawer" aria-hidden="true">
     <div class="drawer-card">
       <div class="drawer-head">
@@ -43,90 +50,140 @@
   </aside>
   <div id="mask" class="mask" hidden></div>
 
-  <main class="stage">
-    <div class="stage-bg"></div>
-
-    <section class="art art-left" aria-hidden="true">
-      <img id="bgLeft" src="" alt="">
-      <div class="art-overlay"></div>
+  <!-- STAGE 3-COLUMN -->
+  <main class="stage" id="main">
+    <!-- left panel -->
+    <section class="side side-left" aria-hidden="true">
+      <img id="bgLeft" class="side-img" src="" alt="">
+      <div class="side-glow"></div>
     </section>
 
-    <section class="art art-right" aria-hidden="true">
-      <img id="bgRight" src="" alt="">
-      <div class="art-overlay"></div>
-    </section>
+    <!-- center -->
+    <section class="mid">
+      <div class="mid-wrap">
+        <div class="hero">
+          <div class="hero-kicker">DASHBOARD</div>
+          <h1 class="hero-title">PREDIKSI ANGKA<br>HIBURAN</h1>
 
-    <section class="center" id="main">
-      <div class="hero">
-        <div class="hero-kicker">DASHBOARD</div>
-        <h1 class="hero-title">PREDIKSI ANGKA HIBURAN</h1>
-        <div class="hero-meta">
-          <span>WIB</span><span class="dot">•</span><span class="pill" id="wibClock">--:--:--</span>
-        </div>
-      </div>
-
-      <div class="card card-main">
-        <h2 class="card-title">Panel Angka Otomatis</h2>
-        <p class="card-sub">Update otomatis mengikuti tanggal WIB (Asia/Jakarta).</p>
-
-        <div class="banner">
-          <span class="banner-ic">📢</span>
-          <div class="banner-text" id="bannerText">Selamat datang.</div>
+          <div class="hero-meta">
+            <span class="meta-label">WIB</span>
+            <span class="meta-dot">•</span>
+            <span class="meta-pill" id="wibClock">--:--:--</span>
+          </div>
         </div>
 
-        <div class="form">
-          <div class="row">
-            <div class="field">
-              <div class="label">Pilih Pasaran</div>
+        <div class="card card-main">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Panel Angka Otomatis</div>
+              <div class="card-sub">Update otomatis mengikuti tanggal WIB (Asia/Jakarta).</div>
+            </div>
+          </div>
+
+          <div class="banner" id="bannerText">
+            📢 Update otomatis harian (WIB)
+          </div>
+
+          <div class="form">
+            <div class="label">Pilih Pasaran</div>
+            <div class="row">
               <select id="market" class="select"></select>
+              <button id="btnLoad" class="btn">LIHAT</button>
             </div>
-            <button id="btnLoad" class="btn">LIHAT</button>
-          </div>
 
-          <div class="panel" id="panel" hidden>
-            <div class="panel-head">
-              <img id="marketLogo" class="m-logo" src="" alt="">
-              <div class="panel-title">
-                <div class="panel-name" id="panelName">-</div>
-                <div class="panel-sub" id="panelDate">-</div>
+            <div class="panel" id="panel" hidden>
+              <div class="panel-head">
+                <img id="marketLogo" class="m-logo" src="" alt="">
+                <div class="panel-title">
+                  <div class="panel-name" id="panelName">-</div>
+                  <div class="panel-sub" id="panelDate">-</div>
+                </div>
+
+                <div class="shio-pill">
+                  <div class="shio-top">SHIO</div>
+                  <div class="shio-val" id="panelShio">-</div>
+                </div>
               </div>
-              <div class="right-pill">
-                <div class="right-pill-top">SHIO</div>
-                <div class="right-pill-val" id="panelShio">-</div>
+
+              <div class="grid">
+                <div class="tile">
+                  <div class="t-label">TANGGAL</div>
+                  <div class="t-val" id="tTanggal">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">BBFS</div>
+                  <div class="t-val gold" id="tBbfs">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">ANGKA IKUT</div>
+                  <div class="t-val gold" id="tIkut">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">4D</div>
+                  <div class="t-val mono" id="t4d">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">3D</div>
+                  <div class="t-val mono" id="t3d">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">2D</div>
+                  <div class="t-val mono" id="t2d">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">COLOK BEBAS</div>
+                  <div class="t-val" id="tColokBebas">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">COLOK MACAU</div>
+                  <div class="t-val" id="tColokMacau">-</div>
+                </div>
+
+                <div class="tile">
+                  <div class="t-label">TWIN</div>
+                  <div class="t-val" id="tTwin">-</div>
+                </div>
               </div>
-            </div>
 
-            <div class="grid">
-              <div class="tile"><div class="t-label">TANGGAL</div><div class="t-val" id="tTanggal">-</div></div>
-              <div class="tile"><div class="t-label">BBFS</div><div class="t-val gold" id="tBbfs">-</div></div>
-              <div class="tile"><div class="t-label">ANGKA IKUT</div><div class="t-val gold" id="tIkut">-</div></div>
-              <div class="tile"><div class="t-label">4D</div><div class="t-val mono" id="t4d">-</div></div>
-              <div class="tile"><div class="t-label">3D</div><div class="t-val mono" id="t3d">-</div></div>
-              <div class="tile"><div class="t-label">2D</div><div class="t-val mono" id="t2d">-</div></div>
-              <div class="tile"><div class="t-label">COLOK BEBAS</div><div class="t-val" id="tColokBebas">-</div></div>
-              <div class="tile"><div class="t-label">COLOK MACAU</div><div class="t-val" id="tColokMacau">-</div></div>
-              <div class="tile"><div class="t-label">TWIN</div><div class="t-val" id="tTwin">-</div></div>
-            </div>
+              <div class="syair">
+                <div class="syair-label">SYAIR</div>
+                <div class="syair-text" id="tSyair">-</div>
+              </div>
 
-            <div class="syair">
-              <div class="syair-label">SYAIR</div>
-              <div class="syair-text" id="tSyair">-</div>
-            </div>
-
-            <div class="actions">
-              <button id="btnRefresh" class="btn-ghost">Refresh</button>
-              <button id="btnCopy" class="btn-ghost">Copy</button>
+              <div class="actions">
+                <button id="btnRefresh" class="btn-ghost">Refresh</button>
+                <button id="btnCopy" class="btn-ghost">Copy</button>
+              </div>
             </div>
           </div>
         </div>
+
+        <div class="card card-info">
+          <div class="info-head">
+            <span class="info-ic">i</span>
+            <div class="info-title">Informasi Penting</div>
+          </div>
+          <p class="info-text" id="disclaimerText">Konten hiburan/demonstrasi UI. Bukan ajakan berjudi.</p>
+        </div>
+
+        <footer class="foot" id="bottom">
+          <div class="foot-left">© 2026 Dashboard</div>
+          <a class="foot-top" href="#top">To the top ↑</a>
+        </footer>
       </div>
+    </section>
 
-      <footer class="bottom" id="bottom">
-        <div class="bottom-card">
-          <p class="bottom-text">© 2026 Dashboard</p>
-          <a class="to-top" href="#top">To the top ↑</a>
-        </div>
-      </footer>
+    <!-- right panel -->
+    <section class="side side-right" aria-hidden="true">
+      <img id="bgRight" class="side-img" src="" alt="">
+      <div class="side-glow"></div>
     </section>
   </main>
 
