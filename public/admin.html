@@ -26,11 +26,12 @@
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .col{flex:1;min-width:240px}
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:800}
-    input{
+    input, textarea{
       width:100%;padding:10px 10px;border-radius:12px;border:1px solid var(--line);
       background:rgba(255,255,255,.06);color:var(--text);outline:none
     }
-    input:focus{border-color:rgba(47,139,255,.65);box-shadow:0 0 0 3px rgba(47,139,255,.12)}
+    textarea{min-height:86px;resize:vertical;line-height:1.35}
+    input:focus, textarea:focus{border-color:rgba(47,139,255,.65);box-shadow:0 0 0 3px rgba(47,139,255,.12)}
     button{
       padding:10px 12px;border-radius:12px;border:1px solid var(--line);
       background:var(--btn);font-weight:900;cursor:pointer;color:var(--text)
@@ -118,6 +119,15 @@
           <label>Background URL (1 saja)</label>
           <input id="bg_left_url" placeholder="https://...webp / .jpg / .png">
           <div class="mini" style="margin-top:6px">Dipakai sebagai background utama (full layar).</div>
+        </div>
+      </div>
+
+      <!-- ✅ Running Text / Ticker -->
+      <div class="row" style="margin-top:10px">
+        <div class="col">
+          <label>Running Text (Ticker)</label>
+          <textarea id="marquee_text" placeholder="contoh: SELAMAT DATANG • INFO TERBARU • DATA TERUPDATE •"></textarea>
+          <div class="mini" style="margin-top:6px">Text ini akan jalan di bagian ticker (running text).</div>
         </div>
       </div>
 
