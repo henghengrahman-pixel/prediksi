@@ -15,7 +15,7 @@
   <!-- TOPBAR -->
   <header class="top" id="top">
     <div class="top-inner">
-      <a class="brand" href="/">
+      <a class="brand" href="#top" aria-label="Home">
         <img id="siteLogo" class="brand-logo" src="https://via.placeholder.com/44x44.png?text=W" alt="Logo">
         <div class="brand-text">
           <div class="brand-name" id="siteTitle">WDBANDAR</div>
@@ -31,6 +31,18 @@
       <button id="btnMenu" class="menu-btn" aria-label="Menu">☰</button>
     </div>
   </header>
+
+  <!-- RUNNING TEXT -->
+  <div class="marquee-wrap" aria-label="Running info">
+    <div class="marquee">
+      <div class="marquee-track">
+        <span id="marqueeText">Update otomatis mengikuti WIB.</span>
+        <span class="marquee-sep">•</span>
+        <span id="marqueeText2">Update otomatis mengikuti WIB.</span>
+        <span class="marquee-sep">•</span>
+      </div>
+    </div>
+  </div>
 
   <!-- DRAWER -->
   <aside id="drawer" class="drawer" aria-hidden="true">
@@ -48,14 +60,14 @@
         <a id="linkDaftar" href="#" target="_blank" rel="noopener">DAFTAR</a>
 
         <a href="/admin">ADMIN</a>
-        <a href="#main">HOME</a>
+        <a href="#top">HOME</a>
         <a href="#bottom">INFO</a>
       </nav>
     </div>
   </aside>
   <div id="mask" class="mask" hidden></div>
 
-  <!-- MAIN (1 background only) -->
+  <!-- MAIN -->
   <main class="single" id="main">
     <div class="single-overlay"></div>
 
@@ -64,23 +76,27 @@
         <div class="hero">
           <div class="hero-kicker">WDBANDAR</div>
 
-          <h1 class="hero-title">PREDIKSI<br>HIBURAN</h1>
+          <!-- Klik judul => balik ke home + reset -->
+          <h1 class="hero-title">
+            <a href="#top" id="homeReset" style="text-decoration:none;color:inherit;">
+              PREDIKSI<br>HIBURAN
+            </a>
+          </h1>
 
-          <!-- TANGGAL SAJA (tanpa jam) -->
           <div class="hero-meta">
-            <span class="meta-pill" id="wibClock">Kamis, 26 Februari 2026</span>
+            <span class="meta-pill" id="wibClock">-</span>
           </div>
         </div>
 
         <div class="card card-main">
           <div class="card-head">
             <div>
-              <div class="card-title">Panel Otomatis</div>
-              <div class="card-sub">Update otomatis sesuai tanggal WIB.</div>
+              <div class="card-title">Panel</div>
+              <div class="card-sub">Tampilkan data setelah memilih pasaran.</div>
             </div>
           </div>
 
-          <div class="banner" id="bannerText">📢 Update otomatis harian (WIB)</div>
+          <div class="banner" id="bannerText">📢 Pilih pasaran lalu klik LIHAT</div>
 
           <div class="form">
             <div class="label">Pilih Pasaran</div>
@@ -89,6 +105,7 @@
               <button id="btnLoad" class="btn">LIHAT</button>
             </div>
 
+            <!-- Panel (akan tetap hidden sampai user klik LIHAT) -->
             <div class="panel" id="panel" hidden>
               <div class="panel-head">
                 <img id="marketLogo" class="m-logo" src="" alt="">
@@ -104,54 +121,19 @@
               </div>
 
               <div class="grid">
-                <div class="tile">
-                  <div class="t-label">TANGGAL</div>
-                  <div class="t-val" id="tTanggal">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">BBFS</div>
-                  <div class="t-val gold" id="tBbfs">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">ANGKA IKUT</div>
-                  <div class="t-val gold" id="tIkut">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">4D</div>
-                  <div class="t-val mono" id="t4d">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">3D</div>
-                  <div class="t-val mono" id="t3d">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">2D</div>
-                  <div class="t-val mono" id="t2d">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">COLOK BEBAS</div>
-                  <div class="t-val" id="tColokBebas">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">COLOK MACAU</div>
-                  <div class="t-val" id="tColokMacau">-</div>
-                </div>
-
-                <div class="tile">
-                  <div class="t-label">TWIN</div>
-                  <div class="t-val" id="tTwin">-</div>
-                </div>
+                <div class="tile"><div class="t-label">TANGGAL</div><div class="t-val" id="tTanggal">-</div></div>
+                <div class="tile"><div class="t-label">BBFS</div><div class="t-val gold" id="tBbfs">-</div></div>
+                <div class="tile"><div class="t-label">ANGKA IKUT</div><div class="t-val gold" id="tIkut">-</div></div>
+                <div class="tile"><div class="t-label">4D</div><div class="t-val mono" id="t4d">-</div></div>
+                <div class="tile"><div class="t-label">3D</div><div class="t-val mono" id="t3d">-</div></div>
+                <div class="tile"><div class="t-label">2D</div><div class="t-val mono" id="t2d">-</div></div>
+                <div class="tile"><div class="t-label">COLOK BEBAS</div><div class="t-val" id="tColokBebas">-</div></div>
+                <div class="tile"><div class="t-label">COLOK MACAU</div><div class="t-val" id="tColokMacau">-</div></div>
+                <div class="tile"><div class="t-label">TWIN</div><div class="t-val" id="tTwin">-</div></div>
               </div>
 
               <div class="syair">
-                <div class="syair-label">SYAIR</div>
+                <div class="syair-label">CATATAN</div>
                 <div class="syair-text" id="tSyair">-</div>
               </div>
 
@@ -168,7 +150,7 @@
             <span class="info-ic">i</span>
             <div class="info-title">Informasi</div>
           </div>
-          <p class="info-text" id="disclaimerText">Konten hiburan/demonstrasi UI.</p>
+          <p class="info-text">Konten hiburan/demonstrasi UI.</p>
         </div>
 
         <footer class="foot" id="bottom">
@@ -178,6 +160,26 @@
       </div>
     </section>
   </main>
+
+  <!-- Reset panel ketika klik "PREDIKSI HIBURAN" -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const homeBtn = document.getElementById("homeReset");
+      if (!homeBtn) return;
+
+      homeBtn.addEventListener("click", function () {
+        const panel = document.getElementById("panel");
+        const market = document.getElementById("market");
+        const banner = document.getElementById("bannerText");
+
+        if (panel) panel.hidden = true;
+        if (market) market.value = "";
+        if (banner) banner.textContent = "📢 Pilih pasaran lalu klik LIHAT";
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+  </script>
 
   <script src="./app.js"></script>
 </body>
