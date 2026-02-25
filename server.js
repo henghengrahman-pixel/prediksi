@@ -148,22 +148,22 @@ function shioFromNumber(n) {
 // ===== Syair bank (banyak) =====
 // (Teks netral / motivasi, berubah tiap pasaran & hari via seed rand)
 const SYAIR_BANK = [
-  "Hari baru, fokus baru. Gas pelan tapi pasti.",
-  "Tenang dulu—yang rapi biasanya menang di konsistensi.",
-  "Jangan buru-buru. Baca situasi, baru ambil langkah.",
-  "Yang penting disiplin, bukan terburu nafsu.",
-  "Kalau hari ini belum sesuai, besok masih ada peluang perbaikan.",
-  "Sabar itu strategi. Panik itu musuh.",
-  "Fokus ke proses, hasil mengikuti arah.",
-  "Rapiin dulu plan, baru jalan.",
-  "Yang konsisten pelan-pelan jadi besar.",
-  "Semangat boleh tinggi, tapi keputusan harus dingin.",
-  "Kalau capek, istirahat. Jangan hilang arah.",
-  "Hari ini belajar, besok naik level.",
-  "Jangan lawan arus kalau belum siap.",
-  "Kunci hari ini: tenang, teliti, tuntas.",
-  "Kecil-kecil asal stabil, jauh lebih aman.",
-  "Bukan soal cepat, tapi soal tepat.",
+  "Setiap mimpi dimulai dengan satu angka.",
+  "Keberuntungan datang bagaikan sinar, kita sambut dengan penuh rasa syukur.",
+  "Kisah indah dalam setiap angka, harapan kita takkan pernah sirna.",
+  "Hari yang penuh harapan, semoga angka ini membawa kita sukses.",
+  "Keberuntungan adalah milik mereka yang berani.",
+  "Di ujung jalan, angka bercerita, kisah keberuntungan, menanti kita.",
+  "Di balik awan, cahaya bersinar, angka terpilih, kebahagiaan menanti.",
+  "Langit cerah, hati berseri, angka-angka ini, harapan yang suci.",
+  "Setiap angka adalah peluang, mari kita ambil kesempatan ini.",
+  "Di setiap angka, ada peluang yang menunggu untuk diambil.",
+  "Dalam setiap detik, harapan akan angka semakin kuat.",
+  "Angka terpilih, langkah berani, dalam perjalanan ini kita kan bersatu.",
+  "Setiap mimpi dimulai dengan satu angka.",
+  "Hari ini, semoga angka ini menjadi pembawa berkah.",
+  "Hari ini adalah kesempatan, mari kita sambut dengan baik.",
+  "Satu langkah, satu harapan, dalam kelam, kita temukan jalan.",
   "Yang penting kontrol diri, bukan ikut ramai.",
   "Pelan itu bukan kalah, pelan itu aman.",
   "Jaga ritme, jangan kebawa suasana.",
@@ -196,7 +196,7 @@ const SYAIR_BANK = [
   "Kuat itu bukan keras, tapi tahan banting.",
   "Yang penting bukan ramai, tapi benar.",
   "Upgrade diri sedikit demi sedikit.",
-  "Cerdas itu tahu kapan berhenti."
+  "Hari yang penuh harapan, semoga angka ini membawa kita sukses."
 ];
 
 function buildPrediction(marketName = "HONGKONG") {
