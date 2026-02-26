@@ -268,10 +268,10 @@ app.get("/api/prediction", (req, res) => {
 });
 
 // ===== Admin pages (DIPISAH) =====
-app.get("/admin", (_req, res) => res.redirect("/admin-login"));
+app.get("/8008", (_req, res) => res.redirect("/8008-login"));
 
-app.get("/admin-login", (_req, res) =>
-  res.sendFile(path.join(__dirname, "public/admin-login.html"))
+app.get("/8008-login", (_req, res) =>
+  res.sendFile(path.join(__dirname, "public/8008-login.html"))
 );
 
 app.get("/admin-panel", (_req, res) =>
