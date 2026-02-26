@@ -52,14 +52,12 @@ function seedDefaults() {
   if (!getSetting("site_title")) setSetting("site_title", "WDBOS Dashboard");
   if (!getSetting("site_logo_url")) setSetting("site_logo_url", "https://via.placeholder.com/44x44.png?text=W");
 
-  // background 1 saja: pakai bg_left_url sebagai background utama
   if (!getSetting("bg_left_url")) {
     setSetting(
       "bg_left_url",
       "https://images.unsplash.com/photo-1520975958225-b561dc06f3f5?q=80&w=1100&auto=format&fit=crop"
     );
   }
-  // biar kompatibel (walau dipakai 1 background)
   if (!getSetting("bg_right_url")) setSetting("bg_right_url", "");
 
   if (!getSetting("link_login")) setSetting("link_login", "#");
@@ -159,7 +157,8 @@ function buildPrediction(marketName = "HONGKONG") {
   const main2d = Math.floor(rand() * 100);
   const shio = shioFromNumber(main2d);
 
-  const makeList = (len, mod, pad) => Array.from({ length: len }, () => String(Math.floor(rand() * mod)).padStart(pad, "0"));
+  const makeList = (len, mod, pad) =>
+    Array.from({ length: len }, () => String(Math.floor(rand() * mod)).padStart(pad, "0"));
 
   const a = Math.floor(rand() * 10);
   const b = Math.floor(rand() * 10);
@@ -222,8 +221,6 @@ function requireAdmin(req, res, next) {
 // ===== App =====
 const app = express();
 app.disable("x-powered-by");
-
-// supaya secure cookie jalan benar di Railway/proxy
 app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "1mb" }));
@@ -267,18 +264,30 @@ app.get("/api/prediction", (req, res) => {
   res.json(buildPrediction(marketName));
 });
 
-// ===== Admin pages (DIPISAH) =====
+// =======================================================
+// ✅ ADMIN URL DIGANTI JADI 8008 (login & panel DIPISAH)
+// =======================================================
+
+// kalau masih ada /admin lama, arahkan ke /8008
+app.get("/admin", (_req, res) => res.redirect("/8008"));
+app.get("/admin-login", (_req, res) => res.redirect("/8008-login"));
+app.get("/admin-panel", (_req, res) => res.redirect("/8008-panel"));
+
+// URL baru
 app.get("/8008", (_req, res) => res.redirect("/8008-login"));
 
-app.get("/8008-login", (_req, res) =>
-  res.sendFile(path.join(__dirname, "public/8008-login.html"))
-);
+app.get("/8008-login", (_req, res) => {
+  // file kamu: public/8008-login.html
+  res.sendFile(path.join(__dirname, "public/8008-login.html"));
+});
 
-app.get("/admin-panel", (_req, res) =>
-  res.sendFile(path.join(__dirname, "public/admin-panel.html"))
-);
+app.get("/8008-panel", (_req, res) => {
+  // panel kamu saat ini: public/admin-panel.html (boleh tetap)
+  // kalau nanti kamu rename jadi 8008-panel.html, tinggal ganti path-nya.
+  res.sendFile(path.join(__dirname, "public/admin-panel.html"));
+});
 
-// ===== Admin auth =====
+// ===== Admin auth API (tetap /api/admin/* biar JS tidak berubah banyak) =====
 app.post("/api/admin/login", (req, res) => {
   if (!ADMIN_ID || !ADMIN_PASSWORD) {
     return res.status(500).json({ error: "ADMIN_CREDENTIALS_NOT_SET" });
@@ -288,8 +297,6 @@ app.post("/api/admin/login", (req, res) => {
   if (id !== ADMIN_ID || pw !== ADMIN_PASSWORD) return res.status(401).json({ error: "INVALID_LOGIN" });
 
   const token = signToken({ id, exp: Date.now() + 1000 * 60 * 60 * 6 }); // 6 jam
-
-  // secure cookie hanya kalau https
   const secure = isSecureReq(req);
 
   res.cookie("admin_token", token, {
@@ -339,7 +346,6 @@ app.post("/api/admin/markets", requireAdmin, (req, res) => {
 
   const id = slugifyId(req.body?.id || name);
 
-  // prevent duplicate id
   const exists = db.prepare("SELECT id FROM markets WHERE id=?").get(id);
   if (exists) return res.status(409).json({ error: "ID_ALREADY_EXISTS" });
 
