@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PINK TIGER • Admin Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#2f343a;
+      --text:#f3f6ff;
+      --muted:rgba(243,246,255,.65);
+      --line:rgba(255,255,255,.14);
+      --shadow:0 20px 70px rgba(0,0,0,.55);
+      --green:#27b36a; --green2:#18a85b;
+      --input:#fff; --inputText:#1b1f24;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      font-family:Inter,system-ui,Arial,sans-serif;
+      background:
+        radial-gradient(900px 520px at 50% 0%, rgba(255,79,216,.12), transparent 60%),
+        radial-gradient(900px 520px at 10% 90%, rgba(39,179,106,.10), transparent 60%),
+        var(--bg);
+      color:var(--text);
+    }
+    .screen{min-height:100vh;display:grid;place-items:center;padding:24px 14px}
+    .box{width:min(520px,94vw);text-align:center}
+    .title{font-weight:900;letter-spacing:.18em;text-transform:uppercase;font-size:12px;margin:0 0 14px;color:rgba(243,246,255,.85)}
+    .logo-card{
+      width:min(360px,92vw);margin:0 auto 18px;
+      background:rgba(0,0,0,.35);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:22px 18px;
+      box-shadow:var(--shadow);
+    }
+    .logo-img{
+      width:280px;max-width:100%;height:auto;display:block;margin:0 auto;
+      filter:drop-shadow(0 10px 24px rgba(0,0,0,.6));
+      border-radius:18px;
+    }
+    .fields{width:min(360px,92vw);margin:0 auto}
+    .field{display:flex;align-items:stretch;margin:10px 0;border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+    .ic{width:44px;display:grid;place-items:center;font-weight:900;color:#fff;user-select:none}
+    .ic.user{background:#25b86d}
+    .ic.pass{background:#f0a52a}
+    .inp{flex:1;border:0;outline:none;background:var(--input);color:var(--inputText);padding:12px 12px;font-size:14px;font-weight:800}
+    .btn{
+      width:min(360px,92vw);margin:14px auto 0;
+      border:0;cursor:pointer;border-radius:4px;
+      padding:12px 14px;font-weight:900;color:#fff;
+      background:linear-gradient(180deg,var(--green),var(--green2));
+      box-shadow:0 14px 30px rgba(0,0,0,.45);
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .msg{width:min(360px,92vw);margin:10px auto 0;font-size:13px;min-height:18px;color:rgba(243,246,255,.85)}
+    .mini{margin-top:12px;font-size:12px;color:var(--muted)}
+    .mini b{color:#fff}
+    a{color:#fff;text-decoration:none;opacity:.9}
+    a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <section class="screen">
+    <div class="box">
+      <div class="title">PINK TIGER • ADMIN</div>
+
+      <div class="logo-card">
+        <img class="logo-img" id="adminLogo"
+             src="https://i.ibb.co/2cYQ7tH/tiger-dev-sample.png"
+             alt="PINK TIGER" />
+      </div>
+
+      <div class="fields">
+        <div class="field">
+          <div class="ic user">👤</div>
+          <input id="aid" class="inp" placeholder="Username" autocomplete="username">
+        </div>
+        <div class="field">
+          <div class="ic pass">🔑</div>
+          <input id="apw" class="inp" type="password" placeholder="Password" autocomplete="current-password">
+        </div>
+      </div>
+
+      <button class="btn" id="btnLogin">Login</button>
+      <div class="msg" id="loginMsg"></div>
+
+      <div class="mini">
+        Login pakai <b>ADMIN_ID</b> & <b>ADMIN_PASSWORD</b> • <a href="/">Back</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="/admin-login.js"></script>
+</body>
+</html>
