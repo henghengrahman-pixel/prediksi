@@ -59,18 +59,12 @@ function seedDefaults() {
       "https://images.unsplash.com/photo-1520975958225-b561dc06f3f5?q=80&w=1100&auto=format&fit=crop"
     );
   }
-  // opsional (biar admin lama tidak rusak)
-  if (!getSetting("bg_right_url")) {
-    setSetting(
-      "bg_right_url",
-      "https://images.unsplash.com/photo-1614851099511-773084e7c7b0?q=80&w=1100&auto=format&fit=crop"
-    );
-  }
+  // biar kompatibel (walau dipakai 1 background)
+  if (!getSetting("bg_right_url")) setSetting("bg_right_url", "");
 
   if (!getSetting("link_login")) setSetting("link_login", "#");
   if (!getSetting("link_daftar")) setSetting("link_daftar", "#");
 
-  // optional running text jika kamu pakai marquee
   if (!getSetting("marquee_text")) setSetting("marquee_text", "Update otomatis mengikuti tanggal WIB.");
 
   const count = db.prepare("SELECT COUNT(*) c FROM markets").get().c;
@@ -89,19 +83,17 @@ function wibDateKey(date = new Date()) {
     timeZone: TZ,
     year: "numeric",
     month: "2-digit",
-    day: "2-digit"
+    day: "2-digit",
   });
   return fmt.format(date); // YYYY-MM-DD
 }
-
 function prettyDateLongWIB(date = new Date()) {
-  // contoh: "Kamis, 26 Februari 2026"
   return new Intl.DateTimeFormat("id-ID", {
     timeZone: TZ,
     weekday: "long",
     day: "2-digit",
     month: "long",
-    year: "numeric"
+    year: "numeric",
   }).format(date);
 }
 
@@ -119,84 +111,37 @@ function xmur3(str) {
     return h >>> 0;
   };
 }
-
 function mulberry32(a) {
   return function () {
-    let t = (a += 0x6D2B79F5);
+    let t = (a += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-
 function pickUnique(rand, count, max) {
   const set = new Set();
   while (set.size < count) set.add(Math.floor(rand() * max));
   return [...set];
 }
 
-// ===== SHIO (urutan sesuai request) =====
-const SHIO = [
-  "KUDA","ULAR","NAGA","KELINCI","HARIMAU","KERBAU",
-  "TIKUS","BABI","ANJING","AYAM","MONYET","KAMBING"
-];
+// ===== SHIO =====
+const SHIO = ["KUDA", "ULAR", "NAGA", "KELINCI", "HARIMAU", "KERBAU", "TIKUS", "BABI", "ANJING", "AYAM", "MONYET", "KAMBING"];
 function shioFromNumber(n) {
   const idx = ((n % 12) + 12) % 12;
   return SHIO[idx];
 }
 
-// ===== Syair bank (banyak) =====
-// (Teks netral / motivasi, berubah tiap pasaran & hari via seed rand)
+// ===== Syair bank =====
 const SYAIR_BANK = [
   "Setiap mimpi dimulai dengan satu angka.",
   "Keberuntungan datang bagaikan sinar, kita sambut dengan penuh rasa syukur.",
-  "Kisah indah dalam setiap angka, harapan kita takkan pernah sirna.",
-  "Hari yang penuh harapan, semoga angka ini membawa kita sukses.",
-  "Keberuntungan adalah milik mereka yang berani.",
-  "Di ujung jalan, angka bercerita, kisah keberuntungan, menanti kita.",
-  "Di balik awan, cahaya bersinar, angka terpilih, kebahagiaan menanti.",
-  "Langit cerah, hati berseri, angka-angka ini, harapan yang suci.",
-  "Setiap angka adalah peluang, mari kita ambil kesempatan ini.",
-  "Di setiap angka, ada peluang yang menunggu untuk diambil.",
-  "Dalam setiap detik, harapan akan angka semakin kuat.",
-  "Angka terpilih, langkah berani, dalam perjalanan ini kita kan bersatu.",
-  "Setiap mimpi dimulai dengan satu angka.",
-  "Hari ini, semoga angka ini menjadi pembawa berkah.",
-  "Hari ini adalah kesempatan, mari kita sambut dengan baik.",
-  "Satu langkah, satu harapan, dalam kelam, kita temukan jalan.",
-  "Yang penting kontrol diri, bukan ikut ramai.",
-  "Pelan itu bukan kalah, pelan itu aman.",
-  "Jaga ritme, jangan kebawa suasana.",
-  "Langkah kecil yang benar lebih baik dari lari tapi salah.",
   "Hari ini buktikan kamu bisa konsisten.",
-  "Kalau bingung, balik ke rencana awal.",
   "Yang penting tetap waras dan rasional.",
-  "Jangan overthinking—tetap pakai logika.",
-  "Biar lambat, asal nggak nyasar.",
-  "Kunci sukses: sabar + disiplin + evaluasi.",
-  "Kalau gagal, itu data. Bukan akhir cerita.",
-  "Jangan kejar sempurna, kejar progres.",
-  "Satu langkah benar lebih bagus dari seribu teori.",
-  "Hari ini rapi, besok tinggal lanjut.",
-  "Hoki itu bonus. Skill itu fondasi.",
-  "Jangan takut reset kalau memang perlu.",
-  "Biar nggak banyak, yang penting konsisten.",
+  "Pelan itu bukan kalah, pelan itu aman.",
   "Lihat pola, bukan emosi.",
-  "Jangan bandingin, fokus ke progress kamu.",
-  "Kalau perlu, mundur selangkah buat maju dua langkah.",
-  "Niat baik, aksi rapi, hasil menyusul.",
-  "Pelan-pelan asal jalan, lebih bagus dari diam.",
-  "Kesabaran itu kekuatan yang sering diremehkan.",
-  "Yang stabil lebih sulit dikalahkan daripada yang cepat.",
-  "Hari ini: jaga fokus, jaga energi.",
-  "Lakukan yang bisa kamu kontrol.",
-  "Jangan biarkan mood ngatur keputusan.",
-  "Kalau ragu, tahan dulu.",
-  "Sikap tenang bikin kamu lebih tajam.",
-  "Kuat itu bukan keras, tapi tahan banting.",
-  "Yang penting bukan ramai, tapi benar.",
-  "Upgrade diri sedikit demi sedikit.",
-  "Hari yang penuh harapan, semoga angka ini membawa kita sukses."
+  "Kalau gagal, itu data. Bukan akhir cerita.",
+  "Hari yang penuh harapan, semoga angka ini membawa kita sukses.",
 ];
 
 function buildPrediction(marketName = "HONGKONG") {
@@ -205,8 +150,6 @@ function buildPrediction(marketName = "HONGKONG") {
   const prettyDate = prettyDateLongWIB(now);
 
   const name = String(marketName || "HONGKONG").toUpperCase().trim();
-
-  // seed = beda tiap pasaran + beda tiap hari
   const seed = `${dateKey}|${name}|WIB`;
   const seedFn = xmur3(seed);
   const rand = mulberry32(seedFn());
@@ -216,10 +159,8 @@ function buildPrediction(marketName = "HONGKONG") {
   const main2d = Math.floor(rand() * 100);
   const shio = shioFromNumber(main2d);
 
-  const makeList = (len, mod, pad) =>
-    Array.from({ length: len }, () => String(Math.floor(rand() * mod)).padStart(pad, "0"));
+  const makeList = (len, mod, pad) => Array.from({ length: len }, () => String(Math.floor(rand() * mod)).padStart(pad, "0"));
 
-  // twin kembar digit: "44 / 88"
   const a = Math.floor(rand() * 10);
   const b = Math.floor(rand() * 10);
   const twin = `${a}${a} / ${b}${b}`;
@@ -240,9 +181,9 @@ function buildPrediction(marketName = "HONGKONG") {
       colok_bebas: pickUnique(rand, 2, 10).join(" / "),
       colok_macau: makeList(3, 100, 2).join(" / "),
       twin,
-      syair
+      syair,
     },
-    disclaimer: "Konten hiburan/demonstrasi UI."
+    disclaimer: "Konten hiburan/demonstrasi UI.",
   };
 }
 
@@ -252,17 +193,18 @@ function signToken(payload) {
   const sig = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
   return `${body}.${sig}`;
 }
-
 function verifyToken(token) {
   if (!token || typeof token !== "string") return null;
   const [body, sig] = token.split(".");
   if (!body || !sig) return null;
+
   const expSig = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
   try {
     if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expSig))) return null;
   } catch {
     return null;
   }
+
   try {
     return JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
   } catch {
@@ -280,11 +222,22 @@ function requireAdmin(req, res, next) {
 // ===== App =====
 const app = express();
 app.disable("x-powered-by");
+
+// supaya secure cookie jalan benar di Railway/proxy
+app.set("trust proxy", 1);
+
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Public API
+// helper: deteksi HTTPS di reverse proxy
+function isSecureReq(req) {
+  if (req.secure) return true;
+  const xf = (req.headers["x-forwarded-proto"] || "").toString();
+  return xf.includes("https");
+}
+
+// ===== Public API =====
 app.get("/api/site", (_req, res) => {
   res.json({
     site_title: getSetting("site_title", "WDBOS Dashboard"),
@@ -293,7 +246,7 @@ app.get("/api/site", (_req, res) => {
     bg_right_url: getSetting("bg_right_url", ""),
     link_login: getSetting("link_login", "#"),
     link_daftar: getSetting("link_daftar", "#"),
-    marquee_text: getSetting("marquee_text", "")
+    marquee_text: getSetting("marquee_text", ""),
   });
 });
 
@@ -314,10 +267,18 @@ app.get("/api/prediction", (req, res) => {
   res.json(buildPrediction(marketName));
 });
 
-// Admin pages
-app.get("/admin", (_req, res) => res.sendFile(path.join(__dirname, "public/admin.html")));
+// ===== Admin pages (DIPISAH) =====
+app.get("/admin", (_req, res) => res.redirect("/admin-login"));
 
-// Admin auth
+app.get("/admin-login", (_req, res) =>
+  res.sendFile(path.join(__dirname, "public/admin-login.html"))
+);
+
+app.get("/admin-panel", (_req, res) =>
+  res.sendFile(path.join(__dirname, "public/admin-panel.html"))
+);
+
+// ===== Admin auth =====
 app.post("/api/admin/login", (req, res) => {
   if (!ADMIN_ID || !ADMIN_PASSWORD) {
     return res.status(500).json({ error: "ADMIN_CREDENTIALS_NOT_SET" });
@@ -327,26 +288,32 @@ app.post("/api/admin/login", (req, res) => {
   if (id !== ADMIN_ID || pw !== ADMIN_PASSWORD) return res.status(401).json({ error: "INVALID_LOGIN" });
 
   const token = signToken({ id, exp: Date.now() + 1000 * 60 * 60 * 6 }); // 6 jam
+
+  // secure cookie hanya kalau https
+  const secure = isSecureReq(req);
+
   res.cookie("admin_token", token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: true,
-    maxAge: 1000 * 60 * 60 * 6
+    secure,
+    maxAge: 1000 * 60 * 60 * 6,
+    path: "/",
   });
+
   res.json({ ok: true });
 });
 
 app.post("/api/admin/logout", (_req, res) => {
-  res.clearCookie("admin_token");
+  res.clearCookie("admin_token", { path: "/" });
   res.json({ ok: true });
 });
 
-// Admin APIs (protected)
+// ===== Admin APIs (protected) =====
 app.get("/api/admin/me", requireAdmin, (_req, res) => res.json({ ok: true }));
 
 app.post("/api/admin/site", requireAdmin, (req, res) => {
   const b = req.body || {};
-  const keys = ["site_title","site_logo_url","bg_left_url","bg_right_url","link_login","link_daftar","marquee_text"];
+  const keys = ["site_title", "site_logo_url", "bg_left_url", "bg_right_url", "link_login", "link_daftar", "marquee_text"];
   for (const k of keys) {
     if (k in b) setSetting(k, b[k]);
   }
@@ -371,8 +338,14 @@ app.post("/api/admin/markets", requireAdmin, (req, res) => {
   if (!name || !logo_url) return res.status(400).json({ error: "NAME_AND_LOGO_REQUIRED" });
 
   const id = slugifyId(req.body?.id || name);
+
+  // prevent duplicate id
+  const exists = db.prepare("SELECT id FROM markets WHERE id=?").get(id);
+  if (exists) return res.status(409).json({ error: "ID_ALREADY_EXISTS" });
+
   db.prepare("INSERT INTO markets(id,name,logo_url,sort_order) VALUES(?,?,?,?)")
     .run(id, name.toUpperCase(), logo_url, sort_order);
+
   res.json({ ok: true, id });
 });
 
